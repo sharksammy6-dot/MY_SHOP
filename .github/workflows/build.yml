@@ -36,6 +36,19 @@ jobs:
             libffi-dev \
             libssl-dev
 
+      - name: Install Android SDK command line tools
+        run: |
+          sudo apt-get install -y android-sdk
+          echo "ANDROID_HOME=/usr/lib/android-sdk" >> $GITHUB_ENV
+          echo "ANDROID_SDK_ROOT=/usr/lib/android-sdk" >> $GITHUB_ENV
+          echo "/usr/lib/android-sdk/cmdline-tools/latest/bin" >> $GITHUB_PATH
+          echo "/usr/lib/android-sdk/platform-tools" >> $GITHUB_PATH
+
+      - name: Install Android SDK packages
+        run: |
+          yes | sdkmanager --licenses || true
+          sdkmanager "platform-tools" "platforms;android-35" "build-tools;35.0.0"
+
       - name: Install Buildozer
         run: |
           python3 -m pip install --upgrade pip

@@ -8,75 +8,23 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-22.04
+    name: Build MY SHOP APK
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            build-essential \
-            git \
-            zip \
-            unzip \
-            openjdk-17-jdk \
-            python3-pip \
-            autoconf \
-            automake \
-            libtool \
-            pkg-config \
-            zlib1g-dev \
-            libncurses5-dev \
-            libncursesw5-dev \
-            libtinfo5 \
-            cmake \
-            libffi-dev \
-            libssl-dev
-
-      - name: Install Buildozer
-        run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install buildozer cython
-
-      - name: Prepare Android SDK for Buildozer
-        run: |
-          export SDK_ROOT="$HOME/.buildozer/android/platform/android-sdk"
-
-          mkdir -p "$SDK_ROOT"
-
-          SDKMANAGER="/usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager"
-
-          if [ ! -f "$SDKMANAGER" ]; then
-            echo "sdkmanager not found at $SDKMANAGER"
-            find /usr/local/lib/android/sdk -name sdkmanager -type f 2>/dev/null || true
-            exit 1
-          fi
-
-          echo "Accepting Android SDK licenses..."
-          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses || true
-
-          echo "Installing Android Build Tools 37.0.0..."
-          "$SDKMANAGER" --sdk_root="$SDK_ROOT" \
-            "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;37.0.0"
-
-          echo "Checking Build Tools..."
-          ls -la "$SDK_ROOT/build-tools/37.0.0"
-
-      - name: Build MY SHOP APK
-        run: |
-          export ANDROID_HOME="$HOME/.buildozer/android/platform/android-sdk"
-          export ANDROID_SDK_ROOT="$HOME/.buildozer/android/platform/android-sdk"
-
-          buildozer android clean
-          buildozer android debug
+      - name: Build with Buildozer
+        uses: ArtemSBulgakov/buildozer-action@v1
+        id: buildozer
+        with:
+          workdir: .
+          buildozer_version: stable
+          command: buildozer android debug
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
         with:
           name: MY_SHOP-APK
-          path: bin/*.apk
+          path: ${{ steps.buildozer.outputs.filename }}

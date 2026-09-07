@@ -41,8 +41,38 @@ jobs:
           python3 -m pip install --upgrade pip
           python3 -m pip install buildozer cython
 
+      - name: Prepare Android SDK for Buildozer
+        run: |
+          export SDK_ROOT="$HOME/.buildozer/android/platform/android-sdk"
+
+          mkdir -p "$SDK_ROOT"
+
+          SDKMANAGER="/usr/local/lib/android/sdk/cmdline-tools/latest/bin/sdkmanager"
+
+          if [ ! -f "$SDKMANAGER" ]; then
+            echo "sdkmanager not found at $SDKMANAGER"
+            find /usr/local/lib/android/sdk -name sdkmanager -type f 2>/dev/null || true
+            exit 1
+          fi
+
+          echo "Accepting Android SDK licenses..."
+          yes | "$SDKMANAGER" --sdk_root="$SDK_ROOT" --licenses || true
+
+          echo "Installing Android Build Tools 37.0.0..."
+          "$SDKMANAGER" --sdk_root="$SDK_ROOT" \
+            "platform-tools" \
+            "platforms;android-35" \
+            "build-tools;37.0.0"
+
+          echo "Checking Build Tools..."
+          ls -la "$SDK_ROOT/build-tools/37.0.0"
+
       - name: Build MY SHOP APK
         run: |
+          export ANDROID_HOME="$HOME/.buildozer/android/platform/android-sdk"
+          export ANDROID_SDK_ROOT="$HOME/.buildozer/android/platform/android-sdk"
+
+          buildozer android clean
           buildozer android debug
 
       - name: Upload APK

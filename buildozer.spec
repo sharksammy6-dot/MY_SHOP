@@ -14,4 +14,4 @@ warn_on_root = 1
 android.accept_sdk_license = True
 android.api = 35
 android.minapi = 21
-android.build_tools_version = 35.0.0
+and

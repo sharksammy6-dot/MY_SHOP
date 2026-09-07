@@ -34,53 +34,15 @@ jobs:
             libtinfo5 \
             cmake \
             libffi-dev \
-            libssl-dev \
-            wget
-
-      - name: Install Android command line tools
-        run: |
-          mkdir -p "$ANDROID_HOME/cmdline-tools"
-          cd /tmp
-
-          wget -q https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip
-
-          unzip -q commandlinetools-linux-11076708_latest.zip
-
-          mkdir -p "$ANDROID_HOME/cmdline-tools/latest"
-          mv cmdline-tools/* "$ANDROID_HOME/cmdline-tools/latest/"
-
-          echo "$ANDROID_HOME/cmdline-tools/latest/bin" >> "$GITHUB_PATH"
-          echo "$ANDROID_HOME/platform-tools" >> "$GITHUB_PATH"
-
-      - name: Set Android SDK environment
-        run: |
-          echo "ANDROID_HOME=$HOME/android-sdk" >> "$GITHUB_ENV"
-          echo "ANDROID_SDK_ROOT=$HOME/android-sdk" >> "$GITHUB_ENV"
-
-      - name: Install Android SDK packages
-        run: |
-          export ANDROID_HOME="$HOME/android-sdk"
-          export ANDROID_SDK_ROOT="$HOME/android-sdk"
-          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
-
-          yes | sdkmanager --licenses || true
-
-          sdkmanager \
-            "platform-tools" \
-            "platforms;android-35" \
-            "build-tools;35.0.0"
+            libssl-dev
 
       - name: Install Buildozer
         run: |
           python3 -m pip install --upgrade pip
           python3 -m pip install buildozer cython
 
-      - name: Build APK
+      - name: Build MY SHOP APK
         run: |
-          export ANDROID_HOME="$HOME/android-sdk"
-          export ANDROID_SDK_ROOT="$HOME/android-sdk"
-          export PATH="$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$PATH"
-
           buildozer android debug
 
       - name: Upload APK

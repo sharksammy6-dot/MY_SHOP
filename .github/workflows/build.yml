@@ -43,12 +43,10 @@ jobs:
           python3 -m pip install buildozer==1.6.0
           python3 -m pip install cython==0.29.34
 
-      
-              - name: Build MY SHOP APK
+      - name: Build MY SHOP APK
         run: |
           set -o pipefail
           yes | buildozer android debug 2>&1 | tee build.log
-        continue-on-error: false
 
       - name: Show Build Log
         if: always()
@@ -63,9 +61,9 @@ jobs:
         with:
           name: MY_SHOP-BUILD-LOG
           path: build.log
-      
 
       - name: Upload APK
+        if: success()
         uses: actions/upload-artifact@v4
         with:
           name: MY_SHOP-APK

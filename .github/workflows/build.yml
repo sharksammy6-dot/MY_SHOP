@@ -15,6 +15,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
+      - name: Set up Python 3.11
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
       - name: Install system dependencies
         run: |
           sudo apt-get update
@@ -23,8 +28,6 @@ jobs:
             zip \
             unzip \
             openjdk-17-jdk \
-            python3-pip \
-            python3-virtualenv \
             autoconf \
             automake \
             libtool \
@@ -32,29 +35,31 @@ jobs:
             zlib1g-dev \
             libncurses5-dev \
             libncursesw5-dev \
-            libtinfo5 \
             cmake \
             libffi-dev \
             libssl-dev
 
       - name: Install Buildozer
         run: |
-          python3 -m pip install --upgrade pip
-          python3 -m pip install buildozer==1.6.0
-          python3 -m pip install cython==0.29.34
+          python -m pip install --upgrade pip setuptools wheel
+          python -m pip install buildozer==1.6.0
+          python -m pip install cython==0.29.34
 
-      - name: Check Buildozer
+      - name: Check environment
         run: |
+          python --version
+          python -m pip --version
           buildozer --version
-          python3 --version
+          cython --version
           java -version
 
       - name: Build MY SHOP APK
         id: build
         run: |
           set -o pipefail
+
           echo "========================================"
-          echo "STARTING BUILDOZER BUILD"
+          echo "STARTING MY SHOP APK BUILD"
           echo "========================================"
 
           yes | buildozer -v android debug 2>&1 | tee build.log
@@ -82,20 +87,13 @@ jobs:
           echo "========================================"
 
           grep -i -E \
-            "error|exception|failed|failure|traceback|command failed|no such file|could not|not found" \
+            "error|exception|failed|failure|traceback|command failed|no such file|could not|not found|unsupported wheel" \
             build.log | tail -n 100 || true
 
           echo ""
           echo "========================================"
           echo "END ERROR REPORT"
           echo "========================================"
-
-      - name: Show Build Log
-        if: always()
-        run: |
-          echo "========== BUILD LOG =========="
-          cat build.log
-          echo "========== END BUILD LOG =========="
 
       - name: Upload Build Log
         if: always()

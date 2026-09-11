@@ -43,10 +43,52 @@ jobs:
           python3 -m pip install buildozer==1.6.0
           python3 -m pip install cython==0.29.34
 
+      - name: Check Buildozer
+        run: |
+          buildozer --version
+          python3 --version
+          java -version
+
       - name: Build MY SHOP APK
+        id: build
         run: |
           set -o pipefail
-          yes | buildozer android debug 2>&1 | tee build.log
+          echo "========================================"
+          echo "STARTING BUILDOZER BUILD"
+          echo "========================================"
+
+          yes | buildozer -v android debug 2>&1 | tee build.log
+
+          BUILD_EXIT=${PIPESTATUS[1]}
+
+          echo "========================================"
+          echo "BUILDOZER EXIT CODE: $BUILD_EXIT"
+          echo "========================================"
+
+          exit $BUILD_EXIT
+
+      - name: Show Build Error
+        if: failure()
+        run: |
+          echo ""
+          echo "========================================"
+          echo "LAST 300 LINES OF BUILD LOG"
+          echo "========================================"
+          tail -n 300 build.log
+
+          echo ""
+          echo "========================================"
+          echo "ERROR LINES"
+          echo "========================================"
+
+          grep -i -E \
+            "error|exception|failed|failure|traceback|command failed|no such file|could not|not found" \
+            build.log | tail -n 100 || true
+
+          echo ""
+          echo "========================================"
+          echo "END ERROR REPORT"
+          echo "========================================"
 
       - name: Show Build Log
         if: always()
@@ -61,6 +103,13 @@ jobs:
         with:
           name: MY_SHOP-BUILD-LOG
           path: build.log
+
+      - name: Check APK
+        if: always()
+        run: |
+          echo "Checking for APK files..."
+          ls -lah bin/ || true
+          find . -name "*.apk" -type f -print || true
 
       - name: Upload APK
         if: success()

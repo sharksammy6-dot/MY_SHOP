@@ -1,3 +1,4 @@
+```yaml
 name: Build MY SHOP APK
 
 on:
@@ -12,7 +13,7 @@ jobs:
     runs-on: ubuntu-22.04
 
     container:
-      image: ghcr.io/kivy/buildozer:latest
+      image: ghcr.io/kivy/buildozer:1.5.0
 
     steps:
       - name: Checkout
@@ -118,3 +119,4 @@ jobs:
           name: MY_SHOP-APK
           path: bin/*.apk
           if-no-files-found: error
+```

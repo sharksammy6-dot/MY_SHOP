@@ -23,12 +23,28 @@ jobs:
           echo "========================================"
           echo "MY SHOP BUILD ENVIRONMENT"
           echo "========================================"
+
+          echo "Python:"
           python3 --version
+
+          echo ""
+          echo "Pip:"
           pip --version
+
+          echo ""
+          echo "Buildozer:"
           buildozer --version
+
+          echo ""
+          echo "Git:"
+          git --version
 
       - name: Clean previous build
         run: |
+          echo "========================================"
+          echo "CLEANING PREVIOUS BUILD"
+          echo "========================================"
+
           rm -rf .buildozer
           rm -rf bin
           rm -f build.log
@@ -46,6 +62,7 @@ jobs:
 
           BUILD_EXIT=${PIPESTATUS[1]}
 
+          echo ""
           echo "========================================"
           echo "BUILDOZER EXIT CODE: $BUILD_EXIT"
           echo "========================================"
@@ -86,6 +103,8 @@ jobs:
           echo "CHECKING FOR APK"
           echo "========================================"
 
+          echo ""
+          echo "BIN DIRECTORY:"
           ls -lah bin/ || true
 
           echo ""
@@ -98,3 +117,4 @@ jobs:
         with:
           name: MY_SHOP-APK
           path: bin/*.apk
+          if-no-files-found: error

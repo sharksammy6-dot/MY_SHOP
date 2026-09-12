@@ -1,3 +1,4 @@
+```ini
 [app]
 
 title = MY SHOP
@@ -9,7 +10,7 @@ source.include_exts = py,json,png,jpg,jpeg,kv,atlas
 
 version = 1.0
 
-requirements = python3==3.12.10,hostpython3==3.12.10,kivy
+requirements = python3,kivy
 
 orientation = portrait
 fullscreen = 0
@@ -25,3 +26,4 @@ warn_on_root = 1
 android.accept_sdk_license = True
 android.api = 35
 android.minapi = 21
+```
